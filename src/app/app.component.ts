@@ -8,11 +8,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { FormsModule } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { GeneratorService } from './generator.service';
 import { NotificationService } from './notification.service';
 import examples, { Example } from './examples';
 import { GeneratorResultComponent } from './generator-result.component';
-
+import { concatMap, from } from 'rxjs';
+import init, { generate_from_api } from "./wasm/generator_wasm"
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -91,9 +91,10 @@ export class AppComponent implements OnInit {
 
   options!:Example[];
 
+  
+
   constructor(private matIconRegistry: MatIconRegistry, 
     private domSanitizer: DomSanitizer,
-    private gs: GeneratorService,
     private notify: NotificationService
     ) {
     this.matIconRegistry.addSvgIcon(
@@ -109,7 +110,8 @@ export class AppComponent implements OnInit {
   }
 
   run() {
-    this.gs.generateApi(this.spec)
+    from(init("assets/generator_wasm_bg.wasm"))
+    .pipe(concatMap(() => generate_from_api(this.spec)))
     .subscribe({
       next: res => {
         this.generatorResult = res;
