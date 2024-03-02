@@ -11,7 +11,7 @@ import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { NotificationService } from './notification.service';
 import examples, { Example } from './examples';
 import { GeneratorResultComponent } from './generator-result.component';
-import { concatMap, from } from 'rxjs';
+import { concatMap, from, switchMap } from 'rxjs';
 import init, { generate_from_api } from "./wasm/generator_wasm"
 @Component({
   selector: 'app-root',
@@ -104,20 +104,25 @@ export class AppComponent implements OnInit {
   }
   ngOnInit(): void {
     this.options = examples;
+    from(init("assets/generator_wasm_bg.wasm")) 
+    .subscribe({
+      next:() => {
+        console.debug("wasm loaded")
+      }
+    })
+    
   }
   openGithub() {
     window.open('https://github.com/theogonic/cronus', '_blank');
   }
 
   run() {
-    from(init("assets/generator_wasm_bg.wasm"))
-    .pipe(concatMap(() => generate_from_api(this.spec)))
-    .subscribe({
-      next: res => {
-        this.generatorResult = res;
-      },
-      error: err => this.notify.error(err)
-    })
+    // FIXME: should make sure wasm is loaded
+    const result = generate_from_api(this.spec);
+    
+    console.log(result);
+    this.generatorResult = result;
+      
   }
 
   selectExample(change: MatSelectChange) {
