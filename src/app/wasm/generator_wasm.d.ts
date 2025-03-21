@@ -9,6 +9,11 @@ export function generate_from_yaml(content: string): any;
 * @param {string} content
 * @returns {any}
 */
+export function api_to_yaml(content: string): any;
+/**
+* @param {string} content
+* @returns {any}
+*/
 export function generate_from_api(content: string): any;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -16,6 +21,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly generate_from_yaml: (a: number, b: number, c: number) => void;
+  readonly api_to_yaml: (a: number, b: number, c: number) => void;
   readonly generate_from_api: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
